@@ -9,6 +9,7 @@ public class PlayerController : Controller
     public KeyCode moveBackKey;
     public KeyCode RotateClockKey;
     public KeyCode RotateCounterKey;
+    public KeyCode shootKey;
 
     // Start is called before the first frame update
     public override void Start()
@@ -29,7 +30,7 @@ public class PlayerController : Controller
         {
             if (GameManager.instance.players != null)
             {
-                GameManager.instance.players.Remoce(this);
+                GameManager.instance.players.Remove(this);
             }
         }
     }
@@ -47,22 +48,38 @@ public class PlayerController : Controller
         if (Input.GetKey(moveForKey))
         {
             pawn.MoveFor();
+            pawn.MakeNoise();
         }
 
         if (Input.GetKey (moveBackKey))
         {
             pawn.MoveBack();
+            pawn.MakeNoise();
         }
 
          if (Input.GetKey(RotateClockKey))
         {
             pawn.RotateClock();
+            pawn.MakeNoise();
         }
 
         if (Input.GetKey (RotateCounterKey))
         {
             pawn.RotateCounter();
+            pawn.MakeNoise();
         }
+
+        if (Input.GetKeyDown(shootKey))
+        {
+            pawn.Shoot();
+            pawn.MakeNoise();
+        }
+
+        if (!Input.GetKey(moveForKey) && !Input.GetKey(moveBackKey) && !Input.GetKey(RotateClockKey) && !Input.GetKey(RotateCounterKey) && !Input.GetKeyDown(shootKey))
+        {
+            pawn.StopNoise();
+        }
+        
     }
 
 }
