@@ -8,11 +8,14 @@ public class TankPawn : Pawn
     private float timerDelay;    
     private float nextShootTime;
 
+    private float oldFirerate;
+
     // Start is called before the first frame update
     public override void Start()
     {
         timerDelay = 1 / fireRate;
         nextShootTime = Time.time + nextShootTime;
+        oldFirerate = fireRate;
         base.Start();
     }
 
@@ -77,5 +80,19 @@ public class TankPawn : Pawn
             noiseMaker.volumeDistance = 0;
         }
     }
-
+    
+    public void UpdateFirerate(float newFirerate)
+    {
+        if (fireRate != oldFirerate)
+        {
+            fireRate = oldFirerate;
+            timerDelay = 1 / fireRate;
+        }
+        else
+        {
+            fireRate = newFirerate;
+            timerDelay = 1 / fireRate;
+        }
+        
+    }
 }

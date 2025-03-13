@@ -15,10 +15,21 @@ public class GameManager : MonoBehaviour
     public GameObject playerControllerPrefab;
     public GameObject tankPawnPrefab;
 
+    public MapGenerator mapGenerator;
+
+    private PawnSpawnPoint[] pawnSpawnPoints;
+
+    public int mapSeed;
+    public bool setSeed;
 
     //runs before start
     public void Awake()
     {
+        if (setSeed)
+        {
+            Random.InitState(mapSeed);
+        }
+
         players = new List<PlayerController>();
         //if no instance yet
         if (instance == null)
@@ -35,6 +46,10 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (mapGenerator != null)
+        {
+            mapGenerator.GenerateMap();
+        }
         //temp
         SpawnPlayer();        
     }
@@ -48,23 +63,34 @@ public class GameManager : MonoBehaviour
 
     public void SpawnPlayer()
     {
+        pawnSpawnPoints = FindObjectsByType<PawnSpawnPoint>(FindObjectsSortMode.None);
+
+        if (pawnSpawnPoints != null)
+        {
+            if (pawnSpawnPoints.Length > 0)
+            {
+                GameObject playerSpawnTransform = pawnSpawnPoints[Random.Range(0, pawnSpawnPoints.Length)].gameObject;
+
+                //spawn player at 0
+                GameObject newPlayerObj = Instantiate(playerControllerPrefab, Vector3.zero, Quaternion.identity);
+
+                //spawn pawn and connect to controller
+                GameObject newPawnObj = Instantiate(tankPawnPrefab, playerSpawnTransform.transform.position, playerSpawnTransform.transform.rotation);
+
+                //get player controller and pawn components
+                Controller newController = newPlayerObj.GetComponent<Controller>();
+                Pawn newPawn = newPawnObj.GetComponent<Pawn>();
         
-        //spawn player at 0
-        GameObject newPlayerObj = Instantiate(playerControllerPrefab, Vector3.zero, Quaternion.identity);
+                newPawnObj.AddComponent<NoiseMaker>();
+                newPawn.noiseMaker = newPawnObj.GetComponent<NoiseMaker>();
+                newPawn.noiseMakerVolume = 3;
 
-        //spawn pawn and connect to controller
-        GameObject newPawnObj = Instantiate(tankPawnPrefab, playerSpawnTransform.position, playerSpawnTransform.rotation);
-
-        //get player controller and pawn components
-        Controller newController = newPlayerObj.GetComponent<Controller>();
-        Pawn newPawn = newPawnObj.GetComponent<Pawn>();
+                //link them
+                newController.pawn = newPawn;
+            }
+        }
         
-        newPawnObj.AddComponent<NoiseMaker>();
-        newPawn.noiseMaker = newPawnObj.GetComponent<NoiseMaker>();
-        newPawn.noiseMakerVolume = 3;
-
-        //link them
-        newController.pawn = newPawn;
+       
         
     }
 }
