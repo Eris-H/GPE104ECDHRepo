@@ -30,14 +30,21 @@ public class EmboldenedAI : AIController
             case AIState.Guard:
                 
                 DoGuardState();
-
-                pawn.RotateTowards(target.transform.position);
-
-                if (IsDistanceLessThan(target, targetDistance))
+                if (IsHasTarget())
                 {
-                    ChangeState(AIState.Flee);
+                    pawn.RotateTowards(target.transform.position);
+
+                    if (IsDistanceLessThan(target, targetDistance))
+                    {
+                        ChangeState(AIState.Flee);
+                    }
                 }
-            break;
+                else
+                {
+                    TargetNearestPlayer();
+                }
+
+                break;
             case AIState.Flee:
                 //find target
                 if (IsHasTarget())
@@ -47,7 +54,9 @@ public class EmboldenedAI : AIController
                 }
                 else
                 {
-                    TargetPlayerOne();
+                    //TargetPlayerOne();
+                    TargetNearestPlayer();
+
                 }
                 //check for transition
 

@@ -7,6 +7,14 @@ public abstract class Controller : MonoBehaviour
 
     //holds the pawn
     public Pawn pawn;
+    //score
+    public int score;
+
+    public int lives;
+
+    public int playerID;
+
+
 
     // Start is called before the first frame update
     public virtual void Start()
@@ -21,4 +29,6 @@ public abstract class Controller : MonoBehaviour
     }
 
     public abstract void ProcessInputs();
+    public abstract void AddToScore(int scoreGained);
+    //public abstract void Respawn();
 }

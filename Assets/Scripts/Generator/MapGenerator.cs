@@ -16,12 +16,21 @@ public class MapGenerator : MonoBehaviour
     void Start()
     {
         //GenerateMap();
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.mapGenerator = this;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void DestroyMap()
+    {
+
     }
 
     public void GenerateMap()

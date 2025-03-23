@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class TankPawn : Pawn
 {
     //fire rate
@@ -10,6 +11,10 @@ public class TankPawn : Pawn
 
     private float oldFirerate;
 
+    public AudioClip firingSound;
+    AudioSource audioSource;
+
+
     // Start is called before the first frame update
     public override void Start()
     {
@@ -17,6 +22,8 @@ public class TankPawn : Pawn
         nextShootTime = Time.time + nextShootTime;
         oldFirerate = fireRate;
         base.Start();
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -51,6 +58,9 @@ public class TankPawn : Pawn
         {
             shooter.Shoot(shellPrefab, fireForce, damageDone, shellLifespan);
             nextShootTime = Time.time + timerDelay;
+            //FiringAudio = GetComponent<AudioSource>();
+            //FiringAudio.Play();
+            audioSource.PlayOneShot(firingSound, 0.7f);
         }
 
     }
@@ -94,5 +104,36 @@ public class TankPawn : Pawn
             timerDelay = 1 / fireRate;
         }
         
+    }
+
+    public void OnDestroy()
+    {
+
+        if (controller.lives != 0)
+        {
+            controller.lives --;
+            //controller.Respawn();
+            GameManager.instance.Respawn(this);
+        }
+        else if (controller.lives == 0)
+        {
+            Destroy(controller.gameObject);
+
+            GameManager.instance.GameEnd();
+
+            /*if (controller.playerID != 0)
+            {
+                Pawn[] allTanks = FindObjectsOfType<Pawn>();
+
+                foreach (Pawn tank in allTanks)
+                {
+                    tank.controller.lives = 0;
+                    Controller Control = tank.controller.GetComponent<Controller>();
+                    Destroy(Control.gameObject);
+                    Destroy(tank.gameObject);
+                }
+
+            }*/
+        }
     }
 }

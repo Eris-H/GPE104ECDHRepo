@@ -35,7 +35,9 @@ public class TurretAI : AIController
                 }
                 else
                 {
-                    TargetPlayerOne();
+                    //TargetPlayerOne();
+                    TargetNearestPlayer();
+
                 }
                 //check for transition
                 //look
@@ -51,14 +53,22 @@ public class TurretAI : AIController
             break;
             case AIState.Watching:
                 //do thing
-                DoWatchState();
-
-                //check for transition
-                if(!IsDistanceLessThan(target, targetDistance) && !IsCanSee(target))
+                if (IsHasTarget())
                 {
-                    //change into guard
-                    ChangeState(AIState.Guard);
+                    DoWatchState();
+
+                    if (!IsDistanceLessThan(target, targetDistance) && !IsCanSee(target))
+                    {
+                        //change into guard
+                        ChangeState(AIState.Guard);
+                    }
                 }
+                else
+                {
+                    TargetNearestPlayer();
+                }
+                    //check for transition
+
                 
                 //else if (!IsCanHear(target))
                 //{

@@ -36,7 +36,9 @@ public class OnTrackTurrets : AIController
                 }
                 else
                 {
-                    TargetPlayerOne();
+                    //TargetPlayerOne();
+                    TargetNearestPlayer();
+
                 }
                 //check for transition                
                 //listen

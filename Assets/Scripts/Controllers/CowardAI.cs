@@ -24,7 +24,6 @@ public class CowardAI : AIController
     {
         base.Update();
 
-
     }
 
     public override void ProcessInputs()
@@ -48,21 +47,28 @@ public class CowardAI : AIController
             case AIState.Attack:
                 //do thing
                 DoAttackState();
-                if (!IsDistanceLessThan(target, targetDistance / 2))
+                if (target != null)
                 {
-                    //change into chase
-                    ChangeState(AIState.Chase);
+                    if (!IsDistanceLessThan(target, targetDistance / 2))
+                    {
+                        //change into chase
+                        ChangeState(AIState.Chase);
+                    }
+                    else if (IsDistanceLessThan(target, targetDistance / 4))
+                    {
+                        //double speed for flee, good scurrying effect
+                        pawn.moveSpeed = pawn.moveSpeed * 3;
+                        ChangeState(AIState.Flee);
+                    }
+                    if (pawn.health.currentHealth < pawn.health.maxHealth - 74)
+                    {
+                        scared = true;
+                        ChangeState(AIState.Flee);
+                    }
                 }
-                else if (IsDistanceLessThan(target, targetDistance / 4))
+                else
                 {
-                    //double speed for flee, good scurrying effect
-                    pawn.moveSpeed = pawn.moveSpeed * 3;
-                    ChangeState(AIState.Flee);
-                }
-                if (pawn.health.currentHealth < pawn.health.maxHealth - 74)
-                {
-                    scared = true;
-                    ChangeState(AIState.Flee);
+                    TargetNearestPlayer();
                 }
             break;     
             case AIState.Guard:
@@ -71,13 +77,17 @@ public class CowardAI : AIController
                 {
                     //do thing
                     DoGuardState();
+                    pawn.RotateTowards(target.transform.position);
+
                 }
                 else
                 { 
-                    TargetPlayerOne(); 
+                    //TargetNearestTank();
+                    //TargetPlayerOne(); 
+                    TargetNearestPlayer();
+
                 }
 
-                pawn.RotateTowards(target.transform.position);
 
                 if (pawn.health.currentHealth < pawn.health.maxHealth - 74)
                 {

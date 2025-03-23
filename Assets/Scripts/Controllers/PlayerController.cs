@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : Controller
 {
@@ -10,6 +11,12 @@ public class PlayerController : Controller
     public KeyCode RotateClockKey;
     public KeyCode RotateCounterKey;
     public KeyCode shootKey;
+
+    public KeyCode P2moveForKey;
+    public KeyCode P2moveBackKey;
+    public KeyCode P2RotateClockKey;
+    public KeyCode P2RotateCounterKey;
+    public KeyCode P2shootKey;
 
     // Start is called before the first frame update
     public override void Start()
@@ -22,18 +29,41 @@ public class PlayerController : Controller
             }
         }
         base.Start();
+        lives = 3;
+
+        if (playerID == 2)
+        {
+            moveForKey = P2moveForKey;
+            moveBackKey = P2moveBackKey;
+            RotateClockKey = P2RotateClockKey;
+            RotateCounterKey = P2RotateCounterKey;
+            shootKey = P2shootKey;
+        }
     }
 
     public void OnDestroy()
     {
-        if (GameManager.instance != null)
-        {
-            if (GameManager.instance.players != null)
+            if (GameManager.instance != null)
             {
-                GameManager.instance.players.Remove(this);
+                Debug.Log("I died");
+
+                if (GameManager.instance.players != null)
+                {
+                    GameManager.instance.players.Remove(this);
+                }
             }
-        }
     }
+
+    /*public override void Respawn()
+    {
+        if(lives != 0)
+        {
+            SpawnPlayer();
+            Pawn[] allTanks = FindObjectsOfType<Pawn>();
+        }
+    }*/
+
+    //public override void TargetNearestPlayer(){}
 
     // Update is called once per frame
     public override void Update()
@@ -80,6 +110,14 @@ public class PlayerController : Controller
             pawn.StopNoise();
         }
         
+    }
+
+    public Text currentScore;
+
+    public override void AddToScore(int scoreGained)
+    {
+        score = scoreGained + score;
+        currentScore.text = "SCORE: " + score;
     }
 
 }

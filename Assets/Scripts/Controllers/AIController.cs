@@ -33,6 +33,7 @@ public class AIController : Controller
 
         ChangeState(AIState.Guard);
         //ChangeState(AIState.Patrol);
+        lives = 1;
 
     }
 
@@ -56,7 +57,7 @@ public class AIController : Controller
                 }
                 else
                 {
-                    TargetPlayerOne();
+                    TargetNearestPlayer();
                 }
                 //check for transition
                 //look
@@ -178,7 +179,10 @@ public class AIController : Controller
     {
         //seek target 
         Debug.Log("doing chase state");
-        Seek(target);
+        if (target != null)
+        {
+            Seek(target);
+        }
     }
 
     public void Shoot()
@@ -188,22 +192,32 @@ public class AIController : Controller
 
     public virtual void DoAttackState()
     {
-        //seek then shoot
-        Seek(target);
-        Shoot();
+        if (target != null)
+        {
+            //seek then shoot
+            Seek(target);
+            Shoot();
+        }
     }
 
     public virtual void DoWatchState()
     {
-        //look at player
-        pawn.RotateTowards(target.transform.position);
-        Shoot();
+        if (target != null)
+        {
+            //look at player
+            pawn.RotateTowards(target.transform.position);
+            Shoot();
+        }
+
     }
 
 
     public virtual void DoFleeState()
     {
-        Flee();
+        if (target != null)
+        {
+            Flee();
+        }
     }
 
     protected void Flee()
@@ -272,6 +286,81 @@ public class AIController : Controller
         }
     }
 
+    protected void TargetNearestTank()
+    {
+        //list of every tank
+        Pawn[] allTanks = FindObjectsOfType<Pawn>();
+        
+        //assume first tank is closest
+        Pawn closestTank = allTanks[0];
+        float closestTankDistance = Vector3.Distance(pawn.transform.position, closestTank.transform.position);
+
+        //check each one, one at a time
+        foreach (Pawn tank in allTanks)
+        {
+            if (Vector3.Distance(pawn.transform.position, tank.transform.position) <= closestTankDistance)
+            {
+                closestTank = tank;
+                closestTankDistance = Vector3.Distance(pawn.transform.position, closestTank.transform.position);
+            }
+        }
+
+        //target closest
+        target = closestTank.gameObject;
+    }
+
+
+    //it's manual and doesn't account for more than two players, but two players are all that we have
+    public void TargetNearestPlayer()
+    {
+        //list every player
+        if (GameManager.instance.players.Count > 0)
+        {
+            //run the check for closer player if there's more than one
+            if (GameManager.instance.players.Count > 1)
+            {
+                Debug.Log("looking for two");
+
+                //collect both players
+                GameObject Play1 = GameManager.instance.players[0].pawn.gameObject;
+                GameObject Play2 = GameManager.instance.players[1].pawn.gameObject;
+            
+
+                //assume closest is player 1
+                GameObject closestPlay = Play1;
+
+                if (Play1 != null && Play2 != null)
+                {
+                    //check which player is closer, priority player 1
+                    if (Vector3.Distance(pawn.transform.position, Play1.transform.position) <= Vector3.Distance(pawn.transform.position, Play2.transform.position))
+                    {
+                        closestPlay = Play1;
+                    }
+                    else 
+                    {
+                        closestPlay = Play2;
+                    }           
+            
+                    target = closestPlay.gameObject;
+                    Debug.Log(target.name);
+                }
+                else
+                {
+                    Debug.Log("can't find");
+                }
+
+
+            }
+            else
+            {
+                Debug.Log("looking for one");
+                //run the same code as target player one if there's only one
+                
+                target = GameManager.instance.players[0].pawn.gameObject;
+            }
+        }
+    }
+
     protected bool IsHasTarget()
     {
         //will be true if we have target
@@ -326,4 +415,13 @@ public class AIController : Controller
             return false;
         }
     }
+
+    public override void AddToScore(int scoreGained)
+    {
+
+    }
+    /*public override void Respawn()
+    {
+
+    }*/
 }
