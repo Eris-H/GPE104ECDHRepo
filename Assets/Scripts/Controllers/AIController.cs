@@ -403,7 +403,7 @@ public class AIController : Controller
         Vector3 agentToTargetVector = target.transform.position - pawn.transform.position;
         //find the angle between where we're facing and targets position
         float angleToTarget = Vector3.Angle(agentToTargetVector, pawn.transform.forward);
-        Debug.Log(angleToTarget);
+        //Debug.Log(angleToTarget);
         //check if said above angle is within our fov restraint
         if(angleToTarget < fieldOfView)
         {

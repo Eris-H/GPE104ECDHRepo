@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 
 public class GameManager : MonoBehaviour
@@ -64,7 +65,27 @@ public class GameManager : MonoBehaviour
         {
             pLayer.lives = 0;
             //    Destroy(pLayer.gameObject);
+            Text ThisScore1;
+            Text ThisScore2;
+
+            int thisScore = pLayer.score;
+            if (pLayer.playerID == 1)
+            {
+                GameOverStart ThisStart = GameOverScreenStateObject.GetComponent<GameOverStart>();
+                ThisScore1 = ThisStart.P1SCORE;
+
+                ThisScore1.text = thisScore.ToString();
+            }
+            else
+            {
+                GameOverStart ThisStart = GameOverScreenStateObject.GetComponent<GameOverStart>();
+                ThisScore2 = ThisStart.P2SCORE;
+             
+                ThisScore2.text = thisScore.ToString();
+            }
+
         }
+
 
 
         ActivateGameOverScreen();

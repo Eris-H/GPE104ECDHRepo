@@ -118,6 +118,11 @@ public class PlayerController : Controller
     {
         score = scoreGained + score;
         currentScore.text = "SCORE: " + score;
+
+        if (score >= 200)
+        {
+            GameManager.instance.GameEnd();
+        }
     }
 
 }

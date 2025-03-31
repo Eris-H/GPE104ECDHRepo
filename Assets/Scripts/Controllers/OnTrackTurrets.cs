@@ -29,8 +29,11 @@ public class OnTrackTurrets : AIController
             //each case should be one of the options in the enum
             case AIState.Patrol:
                 //find target
+                TargetNearestPlayer();
+
                 if (IsHasTarget())
                 {
+
                     //do thing
                     DoPatrolState();
                 }
@@ -44,34 +47,60 @@ public class OnTrackTurrets : AIController
                 //listen
                 if (IsCanHear(target))
                 {
+
                     ChangeState(AIState.Watching);
                 }
             break;
             case AIState.Watching:
-                //do thing
-                DoWatchState();
+                TargetNearestPlayer();
 
-                //check for transition
-                if(!IsDistanceLessThan(target, targetDistance))
+                if (IsHasTarget())
                 {
-                    pawn.moveSpeed = pawn.moveSpeed / 3;
-                    ChangeState(AIState.Chase);
+
+
+                    //do thing
+                    DoWatchState();
+
+                    //check for transition
+                    if (!IsDistanceLessThan(target, targetDistance))
+                    {
+                        pawn.moveSpeed = pawn.moveSpeed / 3;
+                        ChangeState(AIState.Chase);
+                    }
+                }
+                else
+                {
+                    //TargetPlayerOne();
+                    TargetNearestPlayer();
                 }
 
-            break;     
+                break;     
             case AIState.Chase:
-                //chase the player
-                DoChaseState();
-                if(!IsDistanceLessThan(target, targetDistance + 3))
+
+                TargetNearestPlayer();
+
+                if (IsHasTarget())
                 {
-                    pawn.moveSpeed = pawn.moveSpeed * 3;
-                    ChangeState(AIState.Patrol);
+
+                    //chase the player
+                    DoChaseState();
+                    if (!IsDistanceLessThan(target, targetDistance + 3))
+                    {
+                        pawn.moveSpeed = pawn.moveSpeed * 3;
+                        ChangeState(AIState.Patrol);
+                    }
+                    else if (IsDistanceLessThan(target, targetDistance))
+                    {
+                        ChangeState(AIState.Watching);
+                    }
                 }
-                else if (IsDistanceLessThan(target, targetDistance))
+                else
                 {
-                    ChangeState(AIState.Watching);
+                    //TargetPlayerOne();
+                    TargetNearestPlayer();
                 }
-            break;
+
+                break;
         }
     }
 }

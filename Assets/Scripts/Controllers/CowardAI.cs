@@ -33,19 +33,31 @@ public class CowardAI : AIController
             //each case should be one of the options in the enum
             case AIState.Flee:
                 //find target
-                DoFleeState();
-                if (scared == false)
+                TargetNearestPlayer();
+
+                if (IsHasTarget())
                 {
-                    if (!IsDistanceLessThan(target, targetDistance))
+                    DoFleeState();
+                    if (scared == false)
                     {
-                        pawn.moveSpeed = pawn.moveSpeed / 3;
-                        ChangeState(AIState.Guard);
-                    }                
+                        if (!IsDistanceLessThan(target, targetDistance))
+                        {
+                            pawn.moveSpeed = pawn.moveSpeed / 3;
+                            ChangeState(AIState.Guard);
+                        }
+                    }
                 }
- 
-            break;
+                else
+                {
+                    TargetNearestPlayer();
+                }
+
+
+                break;
             case AIState.Attack:
                 //do thing
+                TargetNearestPlayer();
+
                 DoAttackState();
                 if (target != null)
                 {
@@ -72,13 +84,32 @@ public class CowardAI : AIController
                 }
             break;     
             case AIState.Guard:
-                DoGuardState();
+                TargetNearestPlayer();
+
                 if (IsHasTarget())
                 {
+                    DoGuardState();
+
                     //do thing
                     DoGuardState();
                     pawn.RotateTowards(target.transform.position);
-
+                    
+                    if (pawn.health.currentHealth < pawn.health.maxHealth - 74)
+                    {
+                        scared = true;
+                        pawn.moveSpeed = pawn.moveSpeed * 3;
+                        ChangeState(AIState.Flee);
+                    }
+                    else if (IsDistanceLessThan(target, targetDistance))
+                    {
+                        ChangeState(AIState.Chase);
+                    }
+                    else if (IsDistanceLessThan(target, targetDistance / 4))
+                    {
+                        //double speed for flee, good scurrying effect
+                        pawn.moveSpeed = pawn.moveSpeed * 3;
+                        ChangeState(AIState.Flee);
+                    }
                 }
                 else
                 { 
@@ -87,44 +118,33 @@ public class CowardAI : AIController
                     TargetNearestPlayer();
 
                 }
-
-
-                if (pawn.health.currentHealth < pawn.health.maxHealth - 74)
-                {
-                    scared = true;
-                    pawn.moveSpeed = pawn.moveSpeed * 3;
-                    ChangeState(AIState.Flee);
-                }
-                else if (IsDistanceLessThan(target, targetDistance))
-                {
-                    ChangeState(AIState.Chase);
-                }
-                else if (IsDistanceLessThan(target, targetDistance / 4))
-                {
-                    //double speed for flee, good scurrying effect
-                    pawn.moveSpeed = pawn.moveSpeed * 3;
-                    ChangeState(AIState.Flee);
-                }
             break;
             case AIState.Chase:
-            {
-                DoChaseState();
+                TargetNearestPlayer();
 
-                if (pawn.health.currentHealth < pawn.health.maxHealth - 74)
+                if (IsHasTarget())
                 {
-                    ChangeState(AIState.Flee);
+                        DoChaseState();
+
+                        if (pawn.health.currentHealth < pawn.health.maxHealth - 74)
+                        {
+                            ChangeState(AIState.Flee);
+                        }
+                        else if (!IsDistanceLessThan(target, targetDistance))
+                        {
+                            //change into guard
+                            ChangeState(AIState.Guard);
+                        }
+                        else if (IsDistanceLessThan(target, targetDistance / 2))
+                        {
+                            //change into chase
+                            ChangeState(AIState.Attack);
+                        }
                 }
-                else if (!IsDistanceLessThan(target, targetDistance))
+                else
                 {
-                    //change into guard
-                    ChangeState(AIState.Guard);
-                }
-                else if (IsDistanceLessThan(target, targetDistance / 2))
-                {
-                    //change into chase
-                    ChangeState(AIState.Attack);
-                }
-            }
+                    TargetNearestPlayer();
+                }             
             break;
         }
     }

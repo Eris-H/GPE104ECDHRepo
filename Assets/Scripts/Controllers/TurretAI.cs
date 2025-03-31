@@ -28,10 +28,22 @@ public class TurretAI : AIController
             //each case should be one of the options in the enum
             case AIState.Guard:
                 //find target
+                TargetNearestPlayer();
+
                 if (IsHasTarget())
                 {
                     //do thing
                     DoGuardState();
+
+                    if (IsCanSee(target) && IsDistanceLessThan(target, targetDistance))
+                    {
+                        ChangeState(AIState.Watching);
+                    }
+                    //listen
+                    if (IsCanHear(target))
+                    {
+                        ChangeState(AIState.Watching);
+                    }
                 }
                 else
                 {
@@ -41,27 +53,23 @@ public class TurretAI : AIController
                 }
                 //check for transition
                 //look
-                if (IsCanSee(target))
-                {
-                    ChangeState(AIState.Watching);
-                }
-                //listen
-                if (IsCanHear(target))
-                {
-                    ChangeState(AIState.Watching);
-                }
+                
             break;
             case AIState.Watching:
                 //do thing
+                TargetNearestPlayer();
+
                 if (IsHasTarget())
                 {
+
                     DoWatchState();
 
-                    if (!IsDistanceLessThan(target, targetDistance) && !IsCanSee(target))
+                    if (!IsCanSee(target) || !IsDistanceLessThan(target, targetDistance))
                     {
                         //change into guard
                         ChangeState(AIState.Guard);
                     }
+                    
                 }
                 else
                 {

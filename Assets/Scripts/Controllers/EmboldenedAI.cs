@@ -28,10 +28,12 @@ public class EmboldenedAI : AIController
         {
             //each case should be one of the options in the enum
             case AIState.Guard:
-                
-                DoGuardState();
+                TargetNearestPlayer();
+
                 if (IsHasTarget())
                 {
+                    DoGuardState();
+
                     pawn.RotateTowards(target.transform.position);
 
                     if (IsDistanceLessThan(target, targetDistance))
@@ -47,10 +49,21 @@ public class EmboldenedAI : AIController
                 break;
             case AIState.Flee:
                 //find target
+                TargetNearestPlayer();
+
                 if (IsHasTarget())
                 {
                     //do thing
                     DoFleeState();
+
+                    if (pawn.health.currentHealth < pawn.health.maxHealth - 24)
+                    {
+                        ChangeState(AIState.Attack);
+                    }
+                    else if (!IsDistanceLessThan(target, targetDistance))
+                    {
+                        ChangeState(AIState.Guard);
+                    }
                 }
                 else
                 {
@@ -60,20 +73,24 @@ public class EmboldenedAI : AIController
                 }
                 //check for transition
 
-                if (pawn.health.currentHealth < pawn.health.maxHealth - 24)
-                {
-                    ChangeState(AIState.Attack);
-                }
-                else if (!IsDistanceLessThan(target, targetDistance))
-                {
-                    ChangeState(AIState.Guard);
-                }
+                
                 
             break;
             case AIState.Attack:
-                //do thing
-                DoAttackState();
-            break;     
+                TargetNearestPlayer();
+
+                if (IsHasTarget())
+                {
+                    DoAttackState();
+                    //do thing
+                }
+                else
+                {
+                    //TargetPlayerOne();
+                    TargetNearestPlayer();
+
+                }
+                break;     
             
         }
     }
